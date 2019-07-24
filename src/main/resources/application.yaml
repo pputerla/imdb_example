@@ -1,0 +1,40 @@
+log.filename: http_requests.log
+db.filename: C:/Users/User/IdeaProjects/imdb/imdb_full
+
+# jmx interface
+management:
+  endpoints:
+    web:
+      exposure:
+        include: jolokia
+
+# logging
+logbook:
+  include:
+    - /api/**
+  filter:
+    enabled: true
+  secure-filter.enabled: true
+  format:
+    style: http
+  strategy: body-only-if-status-at-least
+  obfuscate:
+    headers:
+      - Authorization
+    write:
+      chunk-size: 1000
+
+
+logging.level:
+   root: INFO
+   org.zalando.logbook.Logbook: TRACE
+
+spring:
+  # database
+  datasource:
+    url: jdbc:h2:file:${db.filename};AUTO_SERVER=TRUE
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
