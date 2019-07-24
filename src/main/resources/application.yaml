@@ -1,5 +1,5 @@
 log.filename: http_requests.log
-db.filename: C:/Users/User/IdeaProjects/imdb/imdb_full
+db.filename: imdb_h2
 
 # jmx interface
 management:
@@ -32,7 +32,7 @@ logging.level:
 spring:
   # database
   datasource:
-    url: jdbc:h2:file:${db.filename};AUTO_SERVER=TRUE
+    url: jdbc:h2:file:${db.filename};MULTI_THREADED=1;PAGE_SIZE=8192
     username: sa
     password:
   jpa:

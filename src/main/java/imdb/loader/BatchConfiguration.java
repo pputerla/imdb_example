@@ -279,11 +279,6 @@ public class BatchConfiguration {
                             }
 
                             jobRepository.update(execution);
-                            try {
-                                jobOperator.restart(execution.getId());
-                            } catch (JobExecutionException e) {
-                                log.warn("Couldn't resume job execution {}", execution, e);
-                            }
                         }
                     }
                 }
