@@ -9,7 +9,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @Slf4j
 @Component
@@ -19,7 +18,7 @@ public class UserHitInterceptor implements HandlerInterceptor {
     private final UserStatisticsMBean userStatisticsMBean;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         userStatisticsMBean.hit(request.getUserPrincipal());
         return true;
     }

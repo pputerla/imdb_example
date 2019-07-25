@@ -1,6 +1,9 @@
 package imdb.api.control;
 
-import imdb.api.entity.*;
+import imdb.api.entity.ActorEntity;
+import imdb.api.entity.ActorMovieRelationEntity;
+import imdb.api.entity.ActorMovieRelationId;
+import imdb.api.entity.MovieEntity;
 import io.swagger.model.Actor;
 import io.swagger.model.Appearance;
 import io.swagger.model.Movie;

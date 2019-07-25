@@ -9,10 +9,11 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WebSocketController {
 
+    public static final String TOPIC_HIT_COUNTS = "/topic/hitCounts";
     private final UserStatisticsMBean userStatisticsMBean;
 
 
-    @SubscribeMapping("/topic/hitCounts")
+    @SubscribeMapping(TOPIC_HIT_COUNTS)
     public void initialReply() {
         userStatisticsMBean.hitCountHandler();
     }

@@ -1,12 +1,12 @@
 package imdb.api.entity;
 
-import io.swagger.model.Movie;
 import lombok.*;
 
-import javax.persistence.*;
-import java.util.HashSet;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Transient;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data

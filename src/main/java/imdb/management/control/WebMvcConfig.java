@@ -6,6 +6,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import static imdb.management.control.SwaggerConfig.API_ANT_PATTERN;
+
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
@@ -16,7 +18,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry
                 .addInterceptor(userHitInterceptor)
-                .addPathPatterns("/api/**");
+                .addPathPatterns(API_ANT_PATTERN);
     }
 
     @Override

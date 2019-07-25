@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -36,14 +35,12 @@ public class UserStatisticsMBean {
     }
 
     public void hitCountHandler() {
-        webSocket.convertAndSend("/topic/hitCounts", userStatsMessage());
+        webSocket.convertAndSend(WebSocketController.TOPIC_HIT_COUNTS, userStatsMessage());
     }
 
     private WebSocketMessage userStatsMessage() {
         return new TextMessage(userHitCount.toString());
     }
-
-
 
 
 }

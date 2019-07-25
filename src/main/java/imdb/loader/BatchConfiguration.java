@@ -50,6 +50,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BatchConfiguration {
 
+    private static final int CONCURRENCY_LIMIT = 8;
     private static final String TITLE_BASICS_URL = "https://datasets.imdbws.com/title.basics.tsv.gz";
     private static final String NAME_BASICS_URL = "https://datasets.imdbws.com/name.basics.tsv.gz";
     private static final String MOVIE_ITEM_READER = "movieItemReader";
@@ -60,7 +61,6 @@ public class BatchConfiguration {
     private static final String IMPORT_ACTORS_STEP = "importActorsStep";
     private static final String SAVE_METHOD = "save";
     private static final int CHUNK_SIZE = 10000;
-    public static final int CONCURRENCY_LIMIT = 8;
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final ResourceLoader resourceLoader;
@@ -253,51 +253,48 @@ public class BatchConfiguration {
     @Bean
     public ApplicationListener<ContextRefreshedEvent> resumeJobsListener(Set<Job> jobs, JobOperator jobOperator, JobRepository jobRepository,
                                                                          JobExplorer jobExplorer, JobLauncher jobLauncher) {
-        // restart jobs that failed due to
         return event -> {
             Date jvmStartTime = new Date(ManagementFactory.getRuntimeMXBean().getStartTime());
 
-            // for each job
             jobExplorer
-                    .getJobNames().forEach(jobName -> {
-                // get latest job instance
-                jobExplorer.getJobInstances(jobName, 0, 1).forEach(instance -> {
-                    // for each of the executions
-                    jobExplorer.getJobExecutions(instance).forEach(execution -> {
-                        if (execution.getStatus().equals(BatchStatus.STARTED) && execution.getCreateTime().before(jvmStartTime)) {
-                            // this job is broken and must be restarted
-                            execution.setEndTime(new Date());
-                            execution.setStatus(BatchStatus.STOPPED);
-                            execution.setExitStatus(ExitStatus.STOPPED);
+                    .getJobNames()
+                    .forEach(jobName -> jobExplorer
+                            .getJobInstances(jobName, 0, 1)
+                            .forEach(instance -> jobExplorer
+                                    .getJobExecutions(instance)
+                                    .forEach(execution -> {
+                                        if (execution.getStatus().equals(BatchStatus.STARTED) && execution.getCreateTime().before(jvmStartTime)) {
+                                            // this job is broken and must be restarted
+                                            execution.setEndTime(new Date());
+                                            execution.setStatus(BatchStatus.STOPPED);
+                                            execution.setExitStatus(ExitStatus.STOPPED);
 
-                            for (StepExecution se : execution.getStepExecutions()) {
-                                if (se.getStatus().equals(BatchStatus.STARTED)) {
-                                    se.setEndTime(new Date());
-                                    se.setStatus(BatchStatus.STOPPED);
-                                    se.setExitStatus(ExitStatus.STOPPED);
-                                    jobRepository.update(se);
-                                }
-                            }
+                                            for (StepExecution se : execution.getStepExecutions()) {
+                                                if (se.getStatus().equals(BatchStatus.STARTED)) {
+                                                    se.setEndTime(new Date());
+                                                    se.setStatus(BatchStatus.STOPPED);
+                                                    se.setExitStatus(ExitStatus.STOPPED);
+                                                    jobRepository.update(se);
+                                                }
+                                            }
+                                            jobRepository.update(execution);
+                                        }
+                                    })));
 
-                            jobRepository.update(execution);
+            jobs
+                    .forEach(job -> {
+                        try {
+                            jobLauncher.run(job, new JobParameters());
+                        } catch (JobExecutionAlreadyRunningException e) {
+                            log.warn("Job is alreday running ({})", e.getMessage());
+                        } catch (JobRestartException e) {
+                            log.error("Problem with job, could not run: {}", e.getMessage());
+                        } catch (JobInstanceAlreadyCompleteException e) {
+                            log.info("Job {} completed: {}", job.getName(), e.getMessage());
+                        } catch (JobParametersInvalidException e) {
+                            log.error("Invalid job parameters: {}", e.getMessage());
                         }
                     });
-                });
-            });
-
-            jobs.forEach(job -> {
-                try {
-                    jobLauncher.run(job, new JobParameters());
-                } catch (JobExecutionAlreadyRunningException e) {
-                    log.warn("Job is alreday running ({})", e.getMessage());
-                } catch (JobRestartException e) {
-                    log.error("Problem with job, could not run: {}", e.getMessage());
-                } catch (JobInstanceAlreadyCompleteException e) {
-                    log.info("Job {} completed: {}", job.getName(), e.getMessage());
-                } catch (JobParametersInvalidException e) {
-                    log.error("Invalid job parameters: {}", e.getMessage());
-                }
-            });
         };
     }
 }

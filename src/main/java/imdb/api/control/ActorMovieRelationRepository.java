@@ -12,7 +12,6 @@ import java.util.List;
 @Repository
 public interface ActorMovieRelationRepository extends JpaRepository<ActorMovieRelationEntity, ActorMovieRelationId> {
 
-
-        @Query("select ar from ActorMovieRelationEntity ar where ar.actorMovieRelationId.actorId=:actorId")
-        List<ActorMovieRelationEntity> findByActorId(@Param("actorId") Long actorId);
+    @Query("select ar from ActorMovieRelationEntity ar where ar.actorMovieRelationId.actorId=:actorId")
+    List<ActorMovieRelationEntity> findByActorId(@Param("actorId") Long actorId);
 }

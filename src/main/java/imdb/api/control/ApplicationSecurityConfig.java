@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static imdb.management.control.SwaggerConfig.API_ANT_PATTERN;
+
 @Configuration
 @EnableWebSecurity
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -20,7 +22,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/api/**").hasRole("USER").and().httpBasic()
+                .antMatchers(API_ANT_PATTERN).hasRole("USER").and().httpBasic()
                 .and()
                 .authorizeRequests()
                 .anyRequest().permitAll()
