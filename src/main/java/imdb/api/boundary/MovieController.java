@@ -30,6 +30,7 @@ public class MovieController implements MoviesApi {
         return ResponseEntity.ok(imdbService.findMovies(page, pageSize, name));
     }
 
+    @Throttling(type = ThrottlingType.PrincipalName, limit = 5, timeUnit = TimeUnit.MINUTES)
     @Override
     public ResponseEntity<Movie> moviesIdGet(BigDecimal id) {
         return imdbService
