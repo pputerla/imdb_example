@@ -1,12 +1,5 @@
-log.filename: http_requests.log
-db.filename: imdb_h2
-
-# jmx interface
-management:
-  endpoints:
-    web:
-      exposure:
-        include: jolokia
+log.filename: ./http_requests.log
+db.filename: ./imdb
 
 # logging
 logbook:
@@ -26,8 +19,8 @@ logbook:
 
 
 logging.level:
-   root: INFO
-   org.zalando.logbook.Logbook: TRACE
+  root: INFO
+  org.zalando.logbook.Logbook: TRACE
 
 spring:
   # database
@@ -38,3 +31,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+  batch:
+    job:
+      enabled: false

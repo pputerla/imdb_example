@@ -18,7 +18,10 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemWriter;
@@ -37,10 +40,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 
 import java.lang.management.ManagementFactory;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -251,18 +251,19 @@ public class BatchConfiguration {
 
 
     @Bean
-    public ApplicationListener<ContextRefreshedEvent> resumeJobsListener(JobOperator jobOperator, JobRepository jobRepository,
-                                                                         JobExplorer jobExplorer) {
+    public ApplicationListener<ContextRefreshedEvent> resumeJobsListener(Set<Job> jobs, JobOperator jobOperator, JobRepository jobRepository,
+                                                                         JobExplorer jobExplorer, JobLauncher jobLauncher) {
         // restart jobs that failed due to
         return event -> {
             Date jvmStartTime = new Date(ManagementFactory.getRuntimeMXBean().getStartTime());
 
             // for each job
-            for (String jobName : jobExplorer.getJobNames()) {
+            jobExplorer
+                    .getJobNames().forEach(jobName -> {
                 // get latest job instance
-                for (JobInstance instance : jobExplorer.getJobInstances(jobName, 0, 1)) {
+                jobExplorer.getJobInstances(jobName, 0, 1).forEach(instance -> {
                     // for each of the executions
-                    for (JobExecution execution : jobExplorer.getJobExecutions(instance)) {
+                    jobExplorer.getJobExecutions(instance).forEach(execution -> {
                         if (execution.getStatus().equals(BatchStatus.STARTED) && execution.getCreateTime().before(jvmStartTime)) {
                             // this job is broken and must be restarted
                             execution.setEndTime(new Date());
@@ -280,9 +281,23 @@ public class BatchConfiguration {
 
                             jobRepository.update(execution);
                         }
-                    }
+                    });
+                });
+            });
+
+            jobs.forEach(job -> {
+                try {
+                    jobLauncher.run(job, new JobParameters());
+                } catch (JobExecutionAlreadyRunningException e) {
+                    log.warn("Job is alreday running ({})", e.getMessage());
+                } catch (JobRestartException e) {
+                    log.error("Problem with job, could not run: {}", e.getMessage());
+                } catch (JobInstanceAlreadyCompleteException e) {
+                    log.info("Job {} completed: {}", job.getName(), e.getMessage());
+                } catch (JobParametersInvalidException e) {
+                    log.error("Invalid job parameters: {}", e.getMessage());
                 }
-            }
+            });
         };
     }
 }
