@@ -21,7 +21,7 @@
     </appender>
 
     <Root level="trace">
-        <appender-ref ref="Console" />
+        <appender-ref ref="Console"/>
     </Root>
 
     <logger name="org.zalando.logbook.Logbook" level="TRACE" additivity="false">

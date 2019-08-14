@@ -11,10 +11,10 @@ function connect() {
 }
 
 
-
 function showHitCounts(message) {
     $("#hitCounts").html("<tr><td>" + message + "</td></tr>");
 }
-$(document).ready(function() {
+
+$(document).ready(function () {
     connect();
-})
+});

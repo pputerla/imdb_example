@@ -10,7 +10,9 @@ import io.swagger.model.Movie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -47,8 +49,7 @@ public class ImdbService {
 
 
     public List<Movie> findMovies(BigDecimal page, BigDecimal pageSize, String name) {
-        return movieRepository
-                .findAll(PageRequest.of(page.intValue(), pageSize.intValue()))
+        return findMoviesPage(PageRequest.of(page.intValue(), pageSize.intValue()), name)
                 .map(movieMapper)
                 .getContent();
 
@@ -61,10 +62,23 @@ public class ImdbService {
     }
 
     public List<Actor> findActors(BigDecimal page, BigDecimal pageSize, String name) {
-        return actorRepository
-                .findAll(PageRequest.of(page.intValue(), pageSize.intValue()))
+        return findActorsPage(PageRequest.of(page.intValue(), pageSize.intValue()), name)
                 .map(actorMapper)
                 .getContent();
+    }
+
+    private Page<ActorEntity> findActorsPage(Pageable page, String name) {
+        if (name == null || name.isBlank()) {
+            return actorRepository.findAll(page);
+        }
+        return actorRepository.findByNameIgnoreCaseContaining(name, page);
+    }
+
+    private Page<MovieEntity> findMoviesPage(Pageable page, String name) {
+        if (name == null || name.isBlank()) {
+            return movieRepository.findAll(page);
+        }
+        return movieRepository.findByTitleIgnoreCaseContaining(name, page);
     }
 
     public Optional<Actor> findActor(BigDecimal id) {

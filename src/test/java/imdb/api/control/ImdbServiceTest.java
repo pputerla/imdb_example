@@ -24,10 +24,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyIterable;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -70,7 +74,7 @@ class ImdbServiceTest {
         when(movieRepository.findAll(any(Pageable.class))).thenReturn(moviePage);
 
         //when
-        List<Movie> result = sut.findMovies(page, pageSize, SOME_NAME);
+        List<Movie> result = sut.findMovies(page, pageSize, null);
 
         //then
         verify(movieRepository).findAll(pageableArgumentCaptor.capture());
@@ -102,9 +106,9 @@ class ImdbServiceTest {
         //then
         verify(movieRepository).findById(SOME_ID);
         assertTrue(movie.isPresent());
-        assertEquals(SOME_TITLE,movie.get().getTitle());
-        assertEquals(""+SOME_YEAR,movie.get().getYear());
-        assertEquals(BigDecimal.valueOf(SOME_ID),movie.get().getId());
+        assertEquals(SOME_TITLE, movie.get().getTitle());
+        assertEquals("" + SOME_YEAR, movie.get().getYear());
+        assertEquals(BigDecimal.valueOf(SOME_ID), movie.get().getId());
     }
 
     @Test
@@ -139,8 +143,8 @@ class ImdbServiceTest {
         //then
         verify(actorRepository).findById(SOME_ID);
         assertTrue(actor.isPresent());
-        assertEquals(SOME_NAME,actor.get().getName());
-        assertEquals(BigDecimal.valueOf(SOME_ID),actor.get().getId());
+        assertEquals(SOME_NAME, actor.get().getName());
+        assertEquals(BigDecimal.valueOf(SOME_ID), actor.get().getId());
     }
 
     @Test
@@ -161,7 +165,7 @@ class ImdbServiceTest {
     @ParameterizedTest
     @CsvSource({"1,10", "222,10", "1,1", "222,1"})
     void findActors(String pageString, String pageSizeString) {
-        ActorEntity movieEntity = ActorEntity
+        ActorEntity actorEntity = ActorEntity
                 .builder()
                 .id(SOME_ID)
                 .name(SOME_NAME)
@@ -170,11 +174,11 @@ class ImdbServiceTest {
         BigDecimal page = new BigDecimal(pageString);
         BigDecimal pageSize = new BigDecimal(pageSizeString);
         PageRequest pageRequest = PageRequest.of(page.intValue(), pageSize.intValue());
-        Page<ActorEntity> actorPage = new PageImpl<>(Collections.singletonList(movieEntity), pageRequest, TOTAL_ENTRIES);
+        Page<ActorEntity> actorPage = new PageImpl<>(Collections.singletonList(actorEntity), pageRequest, TOTAL_ENTRIES);
         when(actorRepository.findAll(any(Pageable.class))).thenReturn(actorPage);
 
         //when
-        List<Actor> result = sut.findActors(page, pageSize, SOME_NAME);
+        List<Actor> result = sut.findActors(page, pageSize, null);
 
         //then
         verify(actorRepository).findAll(pageableArgumentCaptor.capture());
@@ -198,8 +202,8 @@ class ImdbServiceTest {
 
         //then
         verify(actorRepository).findById(SOME_ID);
-        verify(movieRepository,never()).findAllById(anyIterable());
-        assertEquals(0,result.size());
+        verify(movieRepository, never()).findAllById(anyIterable());
+        assertEquals(0, result.size());
     }
 
     //no test for shouldFindAppearances

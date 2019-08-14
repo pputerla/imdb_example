@@ -46,15 +46,15 @@ class ApplicationSecurityConfigTest {
 
     @Test
     void shouldRequireAuth() throws Exception {
-       mvc
-               .perform(post("/api/someRequest"))
-               .andExpect(status().isUnauthorized());
+        mvc
+                .perform(post("/api/someRequest"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     void shouldRejectRequest() throws Exception {
         mvc
-                .perform(post("/api/someRequest").header("Authorization","Basic "+ Base64.getEncoder().encodeToString("user1:pass1".getBytes())))
+                .perform(post("/api/someRequest").header("Authorization", "Basic " + Base64.getEncoder().encodeToString("user1:pass1".getBytes())))
                 .andExpect(status().isNotFound());
     }
 
@@ -62,7 +62,7 @@ class ApplicationSecurityConfigTest {
     @Test
     void shouldNotRequireAuth() throws Exception {
         MvcResult res = mvc.perform(post("/someRequest")).andReturn();
-        assertEquals(404,res.getResponse().getStatus());
+        assertEquals(404, res.getResponse().getStatus());
     }
 
     @ParameterizedTest

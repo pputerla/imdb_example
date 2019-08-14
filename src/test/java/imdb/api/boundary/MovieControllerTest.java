@@ -1,12 +1,10 @@
 package imdb.api.boundary;
 
 import imdb.api.control.ImdbService;
-import io.swagger.model.Actor;
 import io.swagger.model.Movie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -16,8 +14,11 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MovieControllerTest {
@@ -48,9 +49,9 @@ class MovieControllerTest {
         ResponseEntity<List<Movie>> result = sut.moviesGet(page, pageSize, SOME_NAME);
 
         //then
-        verify(imdbService).findMovies(page,pageSize,SOME_NAME);
-        assertEquals(HttpStatus.OK,result.getStatusCode());
-        assertEquals(movies,result.getBody());
+        verify(imdbService).findMovies(page, pageSize, SOME_NAME);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(movies, result.getBody());
     }
 
     @Test
@@ -64,7 +65,7 @@ class MovieControllerTest {
 
         //then
         assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(movie,result.getBody());
+        assertEquals(movie, result.getBody());
     }
 
 
