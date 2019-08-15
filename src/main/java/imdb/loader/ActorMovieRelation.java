@@ -69,6 +69,7 @@ public class ActorMovieRelation {
         return items -> {
             synchronized (lock) {
                 actorMovieRelationRepository.saveAll(items);
+                actorMovieRelationRepository.flush();
             }
         };
     }

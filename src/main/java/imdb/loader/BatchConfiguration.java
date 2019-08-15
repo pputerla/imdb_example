@@ -89,14 +89,14 @@ public class BatchConfiguration {
                                     .forEach(execution -> {
                                         if (execution.getStatus().equals(BatchStatus.STARTED) && execution.getCreateTime().before(jvmStartTime)) {
                                             //
-                                            log.info("{}: this job is broken and must be reset to STOPPED status", jobName);
+                                            log.info("jobExecutionId={}, jobName={}: this job execution is broken and must be reset to STOPPED status", execution.getId(), jobName);
                                             execution.setEndTime(new Date());
                                             execution.setStatus(BatchStatus.STOPPED);
                                             execution.setExitStatus(ExitStatus.STOPPED);
 
                                             for (StepExecution se : execution.getStepExecutions()) {
                                                 if (se.getStatus().equals(BatchStatus.STARTED)) {
-                                                    log.info("{}: this step execution is broken and must be reset to STOPPED status", se.getStepName());
+                                                    log.info("stepName={}, stepId={}, jobName={}: this step execution is broken and must be reset to STOPPED status", se.getStepName(), se.getId(), jobName);
                                                     se.setEndTime(new Date());
                                                     se.setStatus(BatchStatus.STOPPED);
                                                     se.setExitStatus(ExitStatus.STOPPED);

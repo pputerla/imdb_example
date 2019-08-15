@@ -40,7 +40,10 @@ public class Movie {
 
     @Bean
     public ItemWriter<MovieEntity> movieWriter(MovieRepository movieRepository) {
-        return movieRepository::saveAll;
+        return items -> {
+            movieRepository.saveAll(items);
+            movieRepository.flush();
+        };
     }
 
     @Bean

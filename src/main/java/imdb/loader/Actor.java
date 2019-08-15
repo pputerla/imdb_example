@@ -59,7 +59,10 @@ public class Actor {
 
     @Bean
     public ItemWriter<ActorEntity> actorWriter(ActorRepository actorRepository) {
-        return actorRepository::saveAll;
+        return items -> {
+            actorRepository.saveAll(items);
+            actorRepository.flush();
+        };
     }
 
     @Bean

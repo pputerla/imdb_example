@@ -15,12 +15,12 @@ public class LoggingChunkListener implements ChunkListener {
 
     @Override
     public void beforeChunk(ChunkContext chunkContext) {
-        log.info("{} written: {}",stepName, chunkContext.getStepContext().getStepExecution().getWriteCount());
     }
 
     @Override
     public void afterChunk(ChunkContext chunkContext) {
-
+        int written = chunkContext.getStepContext().getStepExecution().getWriteCount();
+        log.info("{} written: {}", stepName, written);
     }
 
     @Override

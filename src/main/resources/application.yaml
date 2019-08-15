@@ -4,11 +4,11 @@ loader:
   bufferSize: 5000000
   autostart: false
   concurrency: 8
-  jobs: 3
+  jobs: 1
   chunk:
-    movie: 20000
-    actor: 20000
-    actorMovieRelation: 20000
+    movie: 10000
+    actor: 10000
+    actorMovieRelation: 50000
 
 # logging
 logbook:
