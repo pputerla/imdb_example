@@ -1,5 +1,12 @@
 log.filename: ./http_requests.log
 db.filename: ./imdb
+loader:
+  autostart: false
+  concurrency: 8
+  chunk:
+    movie: 20000
+    actor: 20000
+    actorMovieRelation: 20000
 
 # logging
 logbook:
@@ -25,7 +32,7 @@ logging.level:
 spring:
   # database
   datasource:
-    url: jdbc:h2:file:${db.filename};MULTI_THREADED=1;PAGE_SIZE=8192
+    url: jdbc:h2:file:${db.filename};MULTI_THREADED=1;PAGE_SIZE=8192;DB_CLOSE_ON_EXIT=FALSE
     username: sa
     password:
   jpa:

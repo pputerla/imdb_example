@@ -132,7 +132,6 @@ class ImdbServiceTest {
                 .builder()
                 .id(SOME_ID)
                 .name(SOME_NAME)
-                .movieIds(Collections.emptyList())
                 .build();
         when(actorRepository.findById(SOME_ID)).thenReturn(Optional.of(actorEntity));
 
@@ -169,7 +168,6 @@ class ImdbServiceTest {
                 .builder()
                 .id(SOME_ID)
                 .name(SOME_NAME)
-                .movieIds(Collections.emptyList())
                 .build();
         BigDecimal page = new BigDecimal(pageString);
         BigDecimal pageSize = new BigDecimal(pageSizeString);

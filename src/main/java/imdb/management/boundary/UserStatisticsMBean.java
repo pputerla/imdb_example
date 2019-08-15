@@ -1,5 +1,6 @@
 package imdb.management.boundary;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -16,11 +17,10 @@ import java.util.concurrent.ConcurrentHashMap;
         objectName = "imdb:category=Statistics,name=userStatistics",
         description = "User Hit Count")
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserStatisticsMBean {
 
-
-    @Autowired
-    private SimpMessagingTemplate webSocket;
+    private final SimpMessagingTemplate webSocket;
 
     private Map<String, Long> userHitCount = new ConcurrentHashMap<>();
 

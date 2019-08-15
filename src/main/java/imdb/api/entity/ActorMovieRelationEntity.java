@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 @Entity
 @Data
@@ -20,6 +21,9 @@ public class ActorMovieRelationEntity {
 
     @EmbeddedId
     private ActorMovieRelationId actorMovieRelationId;
+
+    @Transient
+    private String category;
 
 
 }
