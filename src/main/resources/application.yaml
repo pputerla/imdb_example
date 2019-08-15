@@ -1,8 +1,10 @@
 log.filename: ./http_requests.log
 db.filename: ./imdb
 loader:
+  bufferSize: 5000000
   autostart: false
   concurrency: 8
+  jobs: 3
   chunk:
     movie: 20000
     actor: 20000

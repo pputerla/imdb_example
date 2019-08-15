@@ -59,12 +59,7 @@ public class Actor {
 
     @Bean
     public ItemWriter<ActorEntity> actorWriter(ActorRepository actorRepository) {
-        Object lock = new Object();
-        return items -> {
-            synchronized (lock) {
-                actorRepository.saveAll(items);
-            }
-        };
+        return actorRepository::saveAll;
     }
 
     @Bean

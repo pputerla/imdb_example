@@ -39,10 +39,12 @@ public class BatchConfiguration {
 
     @Value("${loader.concurrency}")
     private Integer concurrencyLimit;
+    @Value("${loader.jobs}")
+    private Integer jobLimit;
+
     static final String TITLE_BASICS_URL = "https://datasets.imdbws.com/title.basics.tsv.gz";
     static final String NAME_BASICS_URL = "https://datasets.imdbws.com/name.basics.tsv.gz";
     static final String TITLE_PRINCIPALS_URL = "https://datasets.imdbws.com/title.principals.tsv.gz";
-    static final String SAVE_METHOD = "save";
     static final LineTokenizer TOKENIZER = line -> new DefaultFieldSet(Stream.of(line.split("\t")).map(l -> "\\N".equals(l) ? null : l).toArray(String[]::new));
 
     @Bean
@@ -53,7 +55,7 @@ public class BatchConfiguration {
     @Bean
     public TaskExecutor taskExecutor() {
         SimpleAsyncTaskExecutor asyncTaskExecutor = new SimpleAsyncTaskExecutor("job_thread_");
-        asyncTaskExecutor.setConcurrencyLimit(3);
+        asyncTaskExecutor.setConcurrencyLimit(jobLimit);
         return asyncTaskExecutor;
     }
 

@@ -36,6 +36,8 @@ public class ActorMovieRelation {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final ResourceLoader resourceLoader;
+    private final Object lock = new Object();
+
 
     @Value("${loader.chunk.actorMovieRelation}")
     private Integer chunkSize;
@@ -64,7 +66,6 @@ public class ActorMovieRelation {
 
     @Bean
     public ItemWriter<ActorMovieRelationEntity> actorMovieRelationWriter(ActorMovieRelationRepository actorMovieRelationRepository) {
-        Object lock = new Object();
         return items -> {
             synchronized (lock) {
                 actorMovieRelationRepository.saveAll(items);

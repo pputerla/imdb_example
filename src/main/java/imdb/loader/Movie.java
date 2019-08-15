@@ -40,12 +40,7 @@ public class Movie {
 
     @Bean
     public ItemWriter<MovieEntity> movieWriter(MovieRepository movieRepository) {
-        Object lock = new Object();
-        return items -> {
-            synchronized (lock) {
-                movieRepository.saveAll(items);
-            }
-        };
+        return movieRepository::saveAll;
     }
 
     @Bean
