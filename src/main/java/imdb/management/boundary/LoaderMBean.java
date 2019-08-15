@@ -11,57 +11,47 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
 
-import java.security.Principal;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 
 @ManagedResource(
         objectName = "imdb:category=Loader,name=control",
-        description = "User Hit Count")
+        description = "Loader Management Bean")
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
 public class LoaderMBean {
 
 
-    private final Set<Job> jobs;
+    private final Job loaderJob;
     private final JobLauncher jobLauncher;
-    private Set<JobExecution> jobExecutions = new HashSet<>();
+    private JobExecution jobExecution;
 
     @ManagedOperation
     public void startLoader() {
-        jobs
-                .forEach(job -> {
-                    try {
-                        log.info("Launching job {}", job.getName());
-                        jobExecutions.add(jobLauncher.run(job, new JobParameters()));
-                    } catch (JobExecutionAlreadyRunningException e) {
-                        log.warn("Job is alreday running ({})", e.getMessage());
-                    } catch (JobRestartException e) {
-                        log.error("Problem with job, could not run: {}", e.getMessage());
-                    } catch (JobInstanceAlreadyCompleteException e) {
-                        log.info("Job {} completed: {}", job.getName(), e.getMessage());
-                    } catch (JobParametersInvalidException e) {
-                        log.error("Invalid job parameters: {}", e.getMessage());
-                    }
-                });
+
+        try {
+            log.info("Launching job {}", loaderJob.getName());
+            jobExecution = jobLauncher.run(loaderJob, new JobParameters());
+        } catch (JobExecutionAlreadyRunningException e) {
+            log.warn("Job is already running ({})", e.getMessage());
+        } catch (JobRestartException e) {
+            log.error("Problem with job, could not run: {}", e.getMessage());
+        } catch (JobInstanceAlreadyCompleteException e) {
+            log.info("Job {} completed: {}", loaderJob.getName(), e.getMessage());
+        } catch (JobParametersInvalidException e) {
+            log.error("Invalid job parameters: {}", e.getMessage());
+        }
+
     }
 
     @ManagedOperation
     public void stopLoader() {
-        log.info("Stopping all jobs");
-        jobExecutions.forEach(JobExecution::stop);
-        jobExecutions.clear();
+        log.info("Stopping loader job");
+        Optional.ofNullable(jobExecution).ifPresent(JobExecution::stop);
     }
 
 

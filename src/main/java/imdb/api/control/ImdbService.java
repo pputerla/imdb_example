@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -49,7 +50,7 @@ public class ImdbService {
 
 
     public List<Movie> findMovies(BigDecimal page, BigDecimal pageSize, String name) {
-        return findMoviesPage(PageRequest.of(page.intValue(), pageSize.intValue()), name)
+        return findMoviesPage(PageRequest.of(page.intValue(), pageSize.intValue(), Sort.by("id")), name)
                 .map(movieMapper)
                 .getContent();
 
@@ -62,7 +63,7 @@ public class ImdbService {
     }
 
     public List<Actor> findActors(BigDecimal page, BigDecimal pageSize, String name) {
-        return findActorsPage(PageRequest.of(page.intValue(), pageSize.intValue()), name)
+        return findActorsPage(PageRequest.of(page.intValue(), pageSize.intValue(), Sort.by("id")), name)
                 .map(actorMapper)
                 .getContent();
     }
@@ -87,7 +88,7 @@ public class ImdbService {
                 .map(actorMapper);
     }
 
-    public List<Appearance> findAppearance(BigDecimal actorId, BigDecimal page, BigDecimal pageSize) {
+    public List<Appearance> findAppearance(BigDecimal actorId) {
         return actorRepository
                 .findById(actorId.longValue())
                 .map(actor -> {

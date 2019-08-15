@@ -35,7 +35,7 @@ public class ActorController implements ActorsApi {
     @Throttling(type = ThrottlingType.PrincipalName, limit = 5, timeUnit = TimeUnit.MINUTES)
     @Override
     public ResponseEntity<List<Appearance>> actorsIdAppearancesGet(BigDecimal actorId, BigDecimal page, BigDecimal pageSize) {
-        return ResponseEntity.ok(imdbService.findAppearance(actorId, page, pageSize));
+        return ResponseEntity.ok(imdbService.findAppearance(actorId));
     }
 
     @Throttling(type = ThrottlingType.PrincipalName, limit = 5, timeUnit = TimeUnit.MINUTES)

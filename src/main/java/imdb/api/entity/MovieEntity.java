@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(indexes = {@Index(name = "title_index", columnList = "title")})
@@ -28,5 +29,8 @@ public class MovieEntity {
     @Column(length = 4096)
     private String title;
     private Integer year;
+
+    @Transient
+    private boolean movie;
 
 }

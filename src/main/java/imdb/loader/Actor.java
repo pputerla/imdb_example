@@ -3,10 +3,9 @@ package imdb.loader;
 import imdb.api.control.ActorRepository;
 import imdb.api.entity.ActorEntity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -18,6 +17,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.TaskExecutor;
 
+import java.util.Optional;
+
 import static imdb.loader.BatchConfiguration.NAME_BASICS_URL;
 import static imdb.loader.BatchConfiguration.TOKENIZER;
 
@@ -25,11 +26,11 @@ import static imdb.loader.BatchConfiguration.TOKENIZER;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class Actor {
 
-    private static final String IMPORT_ACTORS_JOB = "importActorsJob";
     private static final String ACTOR_ITEM_READER = "actorItemReader";
     private static final String IMPORT_ACTORS_STEP = "importActorsStep";
+    private static final ItemProcessor<? super ActorEntity, ? extends ActorEntity> FILTER_ACTOR_PROCESSOR = x -> x.isActor() ? x : null;
 
-    private final JobBuilderFactory jobBuilderFactory;
+
     private final StepBuilderFactory stepBuilderFactory;
     private final ResourceLoader resourceLoader;
 
@@ -43,17 +44,9 @@ public class Actor {
                 .<ActorEntity, ActorEntity>chunk(chunkSize)
                 .reader(reader)
                 .writer(writer)
+                .processor(FILTER_ACTOR_PROCESSOR)
                 .taskExecutor(stepTaskExecutor)
                 .listener(LoggingChunkListener.builder().stepName(IMPORT_ACTORS_STEP).build())
-                .build();
-    }
-
-    @Bean
-    public Job importActorsJob(Step importActorsStep) {
-        return jobBuilderFactory.get(IMPORT_ACTORS_JOB)
-                .incrementer(parameters -> parameters)
-                .flow(importActorsStep)
-                .end()
                 .build();
     }
 
@@ -76,6 +69,7 @@ public class Actor {
                         .builder()
                         .id(Long.parseLong(fieldSet.readString(0).substring(2)))
                         .name(fieldSet.readString(1))
+                        .actor(Optional.ofNullable(fieldSet.readString(4)).filter(x -> x.contains("actor") || x.contains("actress")).isPresent())
                         .build()
                 )
                 .build();

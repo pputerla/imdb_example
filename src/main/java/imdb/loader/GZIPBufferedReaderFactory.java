@@ -16,10 +16,9 @@ import java.io.InputStreamReader;
 @Component
 public class GZIPBufferedReaderFactory implements BufferedReaderFactory {
 
+    private final GZIPInputStreamFactory gzipInputStreamFactory;
     @Value("${loader.bufferSize}")
     private Integer bufferSize;
-
-    private final GZIPInputStreamFactory gzipInputStreamFactory;
 
     @Override
     public BufferedReader create(Resource resource, String encoding) throws IOException {

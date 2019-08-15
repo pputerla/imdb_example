@@ -3,10 +3,9 @@ package imdb.loader;
 import imdb.api.control.MovieRepository;
 import imdb.api.entity.MovieEntity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -27,11 +26,11 @@ import static imdb.loader.BatchConfiguration.TOKENIZER;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class Movie {
 
-    private static final String IMPORT_MOVIES_JOB = "importMoviesJob";
     private static final String MOVIE_ITEM_READER = "movieItemReader";
     private static final String IMPORT_MOVIES_STEP = "importMoviesStep";
+    private static final ItemProcessor<? super MovieEntity, ? extends MovieEntity> FILTER_MOVIE_PROCESSOR = x -> x.isMovie() ? x : null;
 
-    private final JobBuilderFactory jobBuilderFactory;
+
     private final StepBuilderFactory stepBuilderFactory;
     private final ResourceLoader resourceLoader;
 
@@ -58,20 +57,12 @@ public class Movie {
                         .id(Long.parseLong(fieldSet.readString(0).substring(2)))
                         .title(fieldSet.readString(2))
                         .year(Optional.ofNullable(fieldSet.readString(5)).map(Integer::parseInt).orElse(null))
+                        .movie(Optional.ofNullable(fieldSet.readString(1)).filter(x -> x.contains("movie")).isPresent())
                         .build()
                 )
                 .build();
         reader.setBufferedReaderFactory(gzipBufferedReaderFactory);
         return reader;
-    }
-
-    @Bean
-    public Job importMoviesJob(Step importMoviesStep) {
-        return jobBuilderFactory.get(IMPORT_MOVIES_JOB)
-                .incrementer(parameters -> parameters)
-                .flow(importMoviesStep)
-                .end()
-                .build();
     }
 
     @Bean
@@ -81,6 +72,7 @@ public class Movie {
                 .<MovieEntity, MovieEntity>chunk(chunkSize)
                 .reader(reader)
                 .writer(writer)
+                .processor(FILTER_MOVIE_PROCESSOR)
                 .taskExecutor(stepTaskExecutor)
                 .listener(LoggingChunkListener.builder().stepName(IMPORT_MOVIES_STEP).build())
                 .build();

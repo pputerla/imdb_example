@@ -188,15 +188,12 @@ class ImdbServiceTest {
     }
 
 
-    @ParameterizedTest
-    @CsvSource({"1,10", "222,10", "1,1", "222,1"})
-    void shouldNotFindAppearances(String pageString, String pageSizeString) {
+    @Test
+    void shouldNotFindAppearances() {
         //given
-        BigDecimal page = new BigDecimal(pageString);
-        BigDecimal pageSize = new BigDecimal(pageSizeString);
 
         //when
-        List<Appearance> result = sut.findAppearance(BigDecimal.valueOf(SOME_ID), page, pageSize);
+        List<Appearance> result = sut.findAppearance(BigDecimal.valueOf(SOME_ID));
 
         //then
         verify(actorRepository).findById(SOME_ID);

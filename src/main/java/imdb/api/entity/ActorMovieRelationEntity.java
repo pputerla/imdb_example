@@ -23,7 +23,7 @@ public class ActorMovieRelationEntity {
     private ActorMovieRelationId actorMovieRelationId;
 
     @Transient
-    private String category;
+    private boolean actor;
 
 
 }

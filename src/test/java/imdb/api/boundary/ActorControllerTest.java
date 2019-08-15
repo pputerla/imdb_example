@@ -61,16 +61,14 @@ class ActorControllerTest {
     @Test
     void shouldGetAppearances() {
         //given
-        BigDecimal page = mock(BigDecimal.class);
-        BigDecimal pageSize = mock(BigDecimal.class);
         BigDecimal actorId = mock(BigDecimal.class);
-        when(imdbService.findAppearance(actorId, page, pageSize)).thenReturn(appearances);
+        when(imdbService.findAppearance(actorId)).thenReturn(appearances);
 
         //when
-        ResponseEntity<List<Appearance>> result = sut.actorsIdAppearancesGet(actorId, page, pageSize);
+        ResponseEntity<List<Appearance>> result = sut.actorsIdAppearancesGet(actorId, mock(BigDecimal.class), mock(BigDecimal.class));
 
         //then
-        verify(imdbService).findAppearance(actorId, page, pageSize);
+        verify(imdbService).findAppearance(actorId);
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(appearances, result.getBody());
     }

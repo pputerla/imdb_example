@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(indexes = {@Index(name = "name_index", columnList = "name")})
@@ -28,5 +29,8 @@ public class ActorEntity {
 
     @Column(length = 4096)
     private String name;
+
+    @Transient
+    private boolean actor;
 
 }

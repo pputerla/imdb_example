@@ -4,7 +4,6 @@ loader:
   bufferSize: 5000000
   autostart: false
   concurrency: 8
-  jobs: 1
   chunk:
     movie: 10000
     actor: 10000
